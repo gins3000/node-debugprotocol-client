@@ -181,7 +181,9 @@ export abstract class BaseDebugClient {
   protected abstract sendMessage<T extends DebugProtocol.ProtocolMessage>(message: T): void;
 
   // Requests
-  public attach<T extends DebugProtocol.AttachRequest["arguments"]>(args: T): Promise<DebugProtocol.AttachResponse> { return this.sendRequest("attach", args) as Promise<DebugProtocol.AttachResponse>; }
+  public attach<T extends DebugProtocol.AttachRequest["arguments"]>(args: T): Promise<DebugProtocol.AttachResponse> {
+    return this.sendRequest("attach", args) as Promise<DebugProtocol.AttachResponse>;
+  }
 
   public breakpointLocations(args: DebugProtocol.BreakpointLocationsRequest["arguments"]): Promise<DebugProtocol.BreakpointLocationsResponse> {
     return this.sendRequest("breakpointLocations", args) as Promise<DebugProtocol.BreakpointLocationsResponse>;
