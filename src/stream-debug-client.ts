@@ -44,19 +44,19 @@ export class StreamDebugClient extends BaseDebugClient {
     }
   }
 
-  public async sendRequest<T extends DebugProtocol.Request>(command: T["command"], args?: T["arguments"]): Promise<DebugProtocol.Response> {
+  public sendRequest<T extends DebugProtocol.Request>(command: T["command"], args?: T["arguments"]): Promise<DebugProtocol.Response> {
     if (!this.connection) { throw new Error("not connected"); }
     return super.sendRequest(command, args);
   }
 
-  public async sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]) {
+  public sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]) {
     if (!this.connection) { throw new Error("not connected"); }
     return super.sendResponse(request, responseBody);
   }
 
-  public async sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message) {
+  public sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message) {
     if (!this.connection) { throw new Error("not connected"); }
-    super.sendErrorResponse(request, message, error);
+    return super.sendErrorResponse(request, message, error);
   }
 
   public sendMessage<T extends DebugProtocol.ProtocolMessage>(message: T) {
