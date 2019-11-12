@@ -1,0 +1,21 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "typestrict"
+    ],
+    "jsRules": {},
+    "rules": {
+        "interface-name": false,
+        "no-any": true,
+        "no-useless-cast": false,
+        "ordered-imports": true,
+        "quotemark": [
+            true,
+            "double"
+        ],
+        "semicolon": true,
+        "trailing-comma": false,
+        "eofline": true
+    },
+    "rulesDirectory": []
+}
