@@ -9,8 +9,6 @@
     "build": "gulp build",
     "lint": "tslint -p .",
     "start": "gulp watch",
-    "playground": "gulp clean && gulp build && gulp playground",
-    "watch-playground": "gulp watch-playground",
     "prepare": "npm run build"
   },
   "keywords": [
