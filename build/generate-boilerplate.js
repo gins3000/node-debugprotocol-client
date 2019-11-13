@@ -7,62 +7,80 @@ function lowerFirst(str) {
   return str[0].toLocaleLowerCase() + str.slice(1);
 }
 
-function extractRequestNames() {
-  return extractNames(/interface (\w+)Request extends Request/g, [
+function extractRequestTypes() {
+  // matches /** <Documentation> */ interface <Command>Request extends Request)
+  return extractTypes(/(?:(\/\*\*(?:(?!\*\/)[\s\S])+\*\/)[\s]*)?interface (\w*)Request extends Request/gm, [
     "RunInTerminal",
     "Cancel"
   ]);
 }
 
-function extractEventNames() {
-  return extractNames(/interface (\w+)Event extends Event/g, []);
+function extractEventTypes() {
+  // matches /** <Documentation> */ interface <Command>Event extends Event)
+  return extractTypes(/(?:(\/\*\*(?:(?!\*\/)[\s\S])+\*\/)[\s]*)?interface (\w+)Event extends Event/g, []);
 }
 
-async function extractNames(regex, blacklist) {
+async function extractTypes(regex, blacklist) {
   const fileContent = await fs.readFile("node_modules/vscode-debugprotocol/lib/debugProtocol.d.ts", "utf-8");
 
   let match;
   const result = [];
   while (match = regex.exec(fileContent)) {
-    if (!blacklist.includes(match[1])) {
-      result.push(match[1]);
+    if (!blacklist.includes(match[2])) {
+      result.push({
+        docs: match[1],
+        name: match[2]
+      });
     }
   }
 
-  return result.sort();
+  return result.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 async function generateRequestMethods() {
-  const requests = await extractRequestNames();
+  const requests = await extractRequestTypes();
+  let result = "  // Requests\n";
 
-  return "  // Requests\n" + requests.map((x) => {
-    const firstLower = lowerFirst(x);
-    if (["Attach", "Launch"].includes(x)) {
-      return `  public ${firstLower}<T extends DebugProtocol.${x}Request["arguments"]>(args: T): Promise<DebugProtocol.${x}Response> {
-    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${x}Response>;
-  }`;
+  requests.forEach(({ docs, name }) => {
+    const firstLower = lowerFirst(name);
+    if (docs) {
+      result += `  ${docs}\n`
     }
 
-    return `  public ${firstLower}(args: DebugProtocol.${x}Request["arguments"]): Promise<DebugProtocol.${x}Response> {
-    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${x}Response>;
-  }`;
-  }).join("\n\n");
-}
+    if (["Attach", "Launch"].includes(name)) {
+      result += `  public ${firstLower}<T extends DebugProtocol.${name}Request["arguments"]>(args: T): Promise<DebugProtocol.${name}Response> {
+    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response>;
+  }\n\n`;
+    } else {
+      result += `  public ${firstLower}(args: DebugProtocol.${name}Request["arguments"]): Promise<DebugProtocol.${name}Response> {
+    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response>;
+  }\n\n`;
+    }
 
-//   public abstract onEvent<T extends DebugProtocol.Event>(event: T["event"], callback: EventHandler<T>, once: boolean): Unsubscribable;
+  });
+
+  return result;
+}
 
 async function generateEventMethods() {
-  const events = await extractEventNames();
+  const events = await extractEventTypes();
+  let result = "  // Events\n";
 
-  return "  // Events\n" + events.map((event) => {
-    const firstLower = lowerFirst(event);
-    return `  public on${event}(callback: EventHandler<DebugProtocol.${event}Event>, once = false): Unsubscribable {
+  events.forEach(({ docs, name }) => {
+    const firstLower = lowerFirst(name);
+    if (docs) {
+      result += `  ${docs}\n`
+    }
+
+    result += `  public on${name}(callback: EventHandler<DebugProtocol.${name}Event>, once = false): Unsubscribable {
     return this.onEvent("${firstLower}", callback, once);
-  }`;
-  }).join("\n\n");
+  }\n\n`;
+  });
+
+  return result;
 }
 
-gulp.task("extract-request-names", async () => console.log((await extractRequestNames()).join("\n")));
-gulp.task("extract-event-names", async () => console.log((await extractEventNames()).join("\n")));
+gulp.task("extract-request-names", async () => console.log((await extractRequestTypes()).map((t) => t.name).join("\n")));
+gulp.task("extract-event-names", async () => console.log((await extractEventTypes()).map((t) => t.name).join("\n")));
 gulp.task("generate-request-methods", async () => console.log(await generateRequestMethods()));
 gulp.task("generate-event-methods", async () => console.log(await generateEventMethods()));
