@@ -44,7 +44,7 @@ export class SocketDebugClient extends StreamDebugClient {
 
       this.log("Connecting...");
       this.state = ConnectionState.Connecting;
-      this.socket = await new Promise((resolve) => {
+      this.socket = await new Promise((resolve, reject) => {
         const socket = net.createConnection(this.config.port, this.config.host, () => {
           super.connectAdapter(socket, socket);
           resolve(socket);
@@ -52,6 +52,7 @@ export class SocketDebugClient extends StreamDebugClient {
 
         socket.on("error", (e) => {
           this.log(`Socket error: ${e.message}`, e);
+          reject(e);
         });
       });
 
