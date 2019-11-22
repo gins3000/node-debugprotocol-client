@@ -36,7 +36,7 @@ export class SocketDebugClient extends StreamDebugClient {
     this.state = ConnectionState.Disconnected;
   }
 
-  public async connect() {
+  public async connectAdapter() {
     try {
       if (this.state !== ConnectionState.Disconnected) {
         throw new Error(`already '${ConnectionState[this.state]}'`);
