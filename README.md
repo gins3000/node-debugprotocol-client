@@ -1,7 +1,7 @@
 # node-debugprotocol-client
 A standalone node client for the VSCode Debug Adapter Protocol
 
-> This project is a work in progress and should be used in production only with caution!
+> This project is a work in progress and should be used in production only with caution! Breaking changes can and will be made.
 
 There exist a lot of implementations of the [VSCode Debug Adapter Protocol](https://microsoft.github.io/debug-adapter-protocol/), both serverside and clientside, but there don't seem to be a lot of standalone client implementations.
 
