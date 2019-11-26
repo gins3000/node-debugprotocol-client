@@ -48,12 +48,12 @@ async function generateRequestMethods() {
     }
 
     if (["Attach", "Launch"].includes(name)) {
-      result += `  public ${firstLower}<T extends DebugProtocol.${name}Request["arguments"]>(args: T): Promise<DebugProtocol.${name}Response> {
-    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response>;
+      result += `  public ${firstLower}<T extends DebugProtocol.${name}Request["arguments"]>(args: T): Promise<DebugProtocol.${name}Response["body"]> {
+    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response["body"]>;
   }\n\n`;
     } else {
-      result += `  public ${firstLower}(args: DebugProtocol.${name}Request["arguments"]): Promise<DebugProtocol.${name}Response> {
-    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response>;
+      result += `  public ${firstLower}(args: DebugProtocol.${name}Request["arguments"]): Promise<DebugProtocol.${name}Response["body"]> {
+    return this.sendRequest("${firstLower}", args) as Promise<DebugProtocol.${name}Response["body"]>;
   }\n\n`;
     }
 

@@ -90,7 +90,7 @@ export abstract class BaseDebugClient {
     this.config.logger(`[${this.config.loggerName}] ${message}${detailMessage ? ` ${detailMessage}` : ""}`);
   }
 
-  public async sendRequest<T extends DebugProtocol.Request>(command: T["command"], args?: T["arguments"]): Promise<DebugProtocol.Response> {
+  public async sendRequest<T extends DebugProtocol.Request>(command: T["command"], args?: T["arguments"]): Promise<DebugProtocol.Response["body"]> {
     const seq = this.getNextSeq();
 
     const request: DebugProtocol.Request = {
@@ -106,7 +106,7 @@ export abstract class BaseDebugClient {
       this.pendingRequests.set(seq, (response) => {
         if (response.success) {
           this.log(`received response for '${response.command}' (${response.request_seq})`, response);
-          resolve(response);
+          resolve(response.body);
         } else {
           this.log(`received error response for '${response.command}' (${response.request_seq})`, response);
           reject(new Error(response.message));
@@ -184,73 +184,73 @@ export abstract class BaseDebugClient {
   /** Attach request; value of command field is 'attach'.
         The attach request is sent from the client to the debug adapter to attach to a debuggee that is already running. Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
     */
-  public attach<T extends DebugProtocol.AttachRequest["arguments"]>(args: T): Promise<DebugProtocol.AttachResponse> {
-    return this.sendRequest("attach", args) as Promise<DebugProtocol.AttachResponse>;
+  public attach<T extends DebugProtocol.AttachRequest["arguments"]>(args: T): Promise<DebugProtocol.AttachResponse["body"]> {
+    return this.sendRequest("attach", args) as Promise<DebugProtocol.AttachResponse["body"]>;
   }
 
   /** BreakpointLocations request; value of command field is 'breakpointLocations'.
         The 'breakpointLocations' request returns all possible locations for source breakpoints in a given range.
     */
-  public breakpointLocations(args: DebugProtocol.BreakpointLocationsRequest["arguments"]): Promise<DebugProtocol.BreakpointLocationsResponse> {
-    return this.sendRequest("breakpointLocations", args) as Promise<DebugProtocol.BreakpointLocationsResponse>;
+  public breakpointLocations(args: DebugProtocol.BreakpointLocationsRequest["arguments"]): Promise<DebugProtocol.BreakpointLocationsResponse["body"]> {
+    return this.sendRequest("breakpointLocations", args) as Promise<DebugProtocol.BreakpointLocationsResponse["body"]>;
   }
 
   /** Completions request; value of command field is 'completions'.
         Returns a list of possible completions for a given caret position and text.
         The CompletionsRequest may only be called if the 'supportsCompletionsRequest' capability exists and is true.
     */
-  public completions(args: DebugProtocol.CompletionsRequest["arguments"]): Promise<DebugProtocol.CompletionsResponse> {
-    return this.sendRequest("completions", args) as Promise<DebugProtocol.CompletionsResponse>;
+  public completions(args: DebugProtocol.CompletionsRequest["arguments"]): Promise<DebugProtocol.CompletionsResponse["body"]> {
+    return this.sendRequest("completions", args) as Promise<DebugProtocol.CompletionsResponse["body"]>;
   }
 
   /** ConfigurationDone request; value of command field is 'configurationDone'.
         The client of the debug protocol must send this request at the end of the sequence of configuration requests (which was started by the 'initialized' event).
     */
-  public configurationDone(args: DebugProtocol.ConfigurationDoneRequest["arguments"]): Promise<DebugProtocol.ConfigurationDoneResponse> {
-    return this.sendRequest("configurationDone", args) as Promise<DebugProtocol.ConfigurationDoneResponse>;
+  public configurationDone(args: DebugProtocol.ConfigurationDoneRequest["arguments"]): Promise<DebugProtocol.ConfigurationDoneResponse["body"]> {
+    return this.sendRequest("configurationDone", args) as Promise<DebugProtocol.ConfigurationDoneResponse["body"]>;
   }
 
   /** Continue request; value of command field is 'continue'.
         The request starts the debuggee to run again.
     */
-  public continue(args: DebugProtocol.ContinueRequest["arguments"]): Promise<DebugProtocol.ContinueResponse> {
-    return this.sendRequest("continue", args) as Promise<DebugProtocol.ContinueResponse>;
+  public continue(args: DebugProtocol.ContinueRequest["arguments"]): Promise<DebugProtocol.ContinueResponse["body"]> {
+    return this.sendRequest("continue", args) as Promise<DebugProtocol.ContinueResponse["body"]>;
   }
 
   /** DataBreakpointInfo request; value of command field is 'dataBreakpointInfo'.
         Obtains information on a possible data breakpoint that could be set on an expression or variable.
     */
-  public dataBreakpointInfo(args: DebugProtocol.DataBreakpointInfoRequest["arguments"]): Promise<DebugProtocol.DataBreakpointInfoResponse> {
-    return this.sendRequest("dataBreakpointInfo", args) as Promise<DebugProtocol.DataBreakpointInfoResponse>;
+  public dataBreakpointInfo(args: DebugProtocol.DataBreakpointInfoRequest["arguments"]): Promise<DebugProtocol.DataBreakpointInfoResponse["body"]> {
+    return this.sendRequest("dataBreakpointInfo", args) as Promise<DebugProtocol.DataBreakpointInfoResponse["body"]>;
   }
 
   /** Disassemble request; value of command field is 'disassemble'.
         Disassembles code stored at the provided location.
     */
-  public disassemble(args: DebugProtocol.DisassembleRequest["arguments"]): Promise<DebugProtocol.DisassembleResponse> {
-    return this.sendRequest("disassemble", args) as Promise<DebugProtocol.DisassembleResponse>;
+  public disassemble(args: DebugProtocol.DisassembleRequest["arguments"]): Promise<DebugProtocol.DisassembleResponse["body"]> {
+    return this.sendRequest("disassemble", args) as Promise<DebugProtocol.DisassembleResponse["body"]>;
   }
 
   /** Disconnect request; value of command field is 'disconnect'.
         The 'disconnect' request is sent from the client to the debug adapter in order to stop debugging. It asks the debug adapter to disconnect from the debuggee and to terminate the debug adapter. If the debuggee has been started with the 'launch' request, the 'disconnect' request terminates the debuggee. If the 'attach' request was used to connect to the debuggee, 'disconnect' does not terminate the debuggee. This behavior can be controlled with the 'terminateDebuggee' argument (if supported by the debug adapter).
     */
-  public disconnect(args: DebugProtocol.DisconnectRequest["arguments"]): Promise<DebugProtocol.DisconnectResponse> {
-    return this.sendRequest("disconnect", args) as Promise<DebugProtocol.DisconnectResponse>;
+  public disconnect(args: DebugProtocol.DisconnectRequest["arguments"]): Promise<DebugProtocol.DisconnectResponse["body"]> {
+    return this.sendRequest("disconnect", args) as Promise<DebugProtocol.DisconnectResponse["body"]>;
   }
 
   /** Evaluate request; value of command field is 'evaluate'.
         Evaluates the given expression in the context of the top most stack frame.
         The expression has access to any variables and arguments that are in scope.
     */
-  public evaluate(args: DebugProtocol.EvaluateRequest["arguments"]): Promise<DebugProtocol.EvaluateResponse> {
-    return this.sendRequest("evaluate", args) as Promise<DebugProtocol.EvaluateResponse>;
+  public evaluate(args: DebugProtocol.EvaluateRequest["arguments"]): Promise<DebugProtocol.EvaluateResponse["body"]> {
+    return this.sendRequest("evaluate", args) as Promise<DebugProtocol.EvaluateResponse["body"]>;
   }
 
   /** ExceptionInfo request; value of command field is 'exceptionInfo'.
         Retrieves the details of the exception that caused this event to be raised.
     */
-  public exceptionInfo(args: DebugProtocol.ExceptionInfoRequest["arguments"]): Promise<DebugProtocol.ExceptionInfoResponse> {
-    return this.sendRequest("exceptionInfo", args) as Promise<DebugProtocol.ExceptionInfoResponse>;
+  public exceptionInfo(args: DebugProtocol.ExceptionInfoRequest["arguments"]): Promise<DebugProtocol.ExceptionInfoResponse["body"]> {
+    return this.sendRequest("exceptionInfo", args) as Promise<DebugProtocol.ExceptionInfoResponse["body"]>;
   }
 
   /** Goto request; value of command field is 'goto'.
@@ -259,8 +259,8 @@ export abstract class BaseDebugClient {
         The code between the current location and the goto target is not executed but skipped.
         The debug adapter first sends the response and then a 'stopped' event with reason 'goto'.
     */
-  public goto(args: DebugProtocol.GotoRequest["arguments"]): Promise<DebugProtocol.GotoResponse> {
-    return this.sendRequest("goto", args) as Promise<DebugProtocol.GotoResponse>;
+  public goto(args: DebugProtocol.GotoRequest["arguments"]): Promise<DebugProtocol.GotoResponse["body"]> {
+    return this.sendRequest("goto", args) as Promise<DebugProtocol.GotoResponse["body"]>;
   }
 
   /** GotoTargets request; value of command field is 'gotoTargets'.
@@ -268,8 +268,8 @@ export abstract class BaseDebugClient {
         These targets can be used in the 'goto' request.
         The GotoTargets request may only be called if the 'supportsGotoTargetsRequest' capability exists and is true.
     */
-  public gotoTargets(args: DebugProtocol.GotoTargetsRequest["arguments"]): Promise<DebugProtocol.GotoTargetsResponse> {
-    return this.sendRequest("gotoTargets", args) as Promise<DebugProtocol.GotoTargetsResponse>;
+  public gotoTargets(args: DebugProtocol.GotoTargetsRequest["arguments"]): Promise<DebugProtocol.GotoTargetsResponse["body"]> {
+    return this.sendRequest("gotoTargets", args) as Promise<DebugProtocol.GotoTargetsResponse["body"]>;
   }
 
   /** Initialize request; value of command field is 'initialize'.
@@ -277,52 +277,52 @@ export abstract class BaseDebugClient {
         Until the debug adapter has responded to with an 'initialize' response, the client must not send any additional requests or events to the debug adapter. In addition the debug adapter is not allowed to send any requests or events to the client until it has responded with an 'initialize' response.
         The 'initialize' request may only be sent once.
     */
-  public initialize(args: DebugProtocol.InitializeRequest["arguments"]): Promise<DebugProtocol.InitializeResponse> {
-    return this.sendRequest("initialize", args) as Promise<DebugProtocol.InitializeResponse>;
+  public initialize(args: DebugProtocol.InitializeRequest["arguments"]): Promise<DebugProtocol.InitializeResponse["body"]> {
+    return this.sendRequest("initialize", args) as Promise<DebugProtocol.InitializeResponse["body"]>;
   }
 
   /** Launch request; value of command field is 'launch'.
         The launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true). Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
     */
-  public launch<T extends DebugProtocol.LaunchRequest["arguments"]>(args: T): Promise<DebugProtocol.LaunchResponse> {
-    return this.sendRequest("launch", args) as Promise<DebugProtocol.LaunchResponse>;
+  public launch<T extends DebugProtocol.LaunchRequest["arguments"]>(args: T): Promise<DebugProtocol.LaunchResponse["body"]> {
+    return this.sendRequest("launch", args) as Promise<DebugProtocol.LaunchResponse["body"]>;
   }
 
   /** LoadedSources request; value of command field is 'loadedSources'.
         Retrieves the set of all sources currently loaded by the debugged process.
     */
-  public loadedSources(args: DebugProtocol.LoadedSourcesRequest["arguments"]): Promise<DebugProtocol.LoadedSourcesResponse> {
-    return this.sendRequest("loadedSources", args) as Promise<DebugProtocol.LoadedSourcesResponse>;
+  public loadedSources(args: DebugProtocol.LoadedSourcesRequest["arguments"]): Promise<DebugProtocol.LoadedSourcesResponse["body"]> {
+    return this.sendRequest("loadedSources", args) as Promise<DebugProtocol.LoadedSourcesResponse["body"]>;
   }
 
   /** Modules request; value of command field is 'modules'.
         Modules can be retrieved from the debug adapter with the ModulesRequest which can either return all modules or a range of modules to support paging.
     */
-  public modules(args: DebugProtocol.ModulesRequest["arguments"]): Promise<DebugProtocol.ModulesResponse> {
-    return this.sendRequest("modules", args) as Promise<DebugProtocol.ModulesResponse>;
+  public modules(args: DebugProtocol.ModulesRequest["arguments"]): Promise<DebugProtocol.ModulesResponse["body"]> {
+    return this.sendRequest("modules", args) as Promise<DebugProtocol.ModulesResponse["body"]>;
   }
 
   /** Next request; value of command field is 'next'.
         The request starts the debuggee to run again for one step.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed.
     */
-  public next(args: DebugProtocol.NextRequest["arguments"]): Promise<DebugProtocol.NextResponse> {
-    return this.sendRequest("next", args) as Promise<DebugProtocol.NextResponse>;
+  public next(args: DebugProtocol.NextRequest["arguments"]): Promise<DebugProtocol.NextResponse["body"]> {
+    return this.sendRequest("next", args) as Promise<DebugProtocol.NextResponse["body"]>;
   }
 
   /** Pause request; value of command field is 'pause'.
         The request suspends the debuggee.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'pause') after the thread has been paused successfully.
     */
-  public pause(args: DebugProtocol.PauseRequest["arguments"]): Promise<DebugProtocol.PauseResponse> {
-    return this.sendRequest("pause", args) as Promise<DebugProtocol.PauseResponse>;
+  public pause(args: DebugProtocol.PauseRequest["arguments"]): Promise<DebugProtocol.PauseResponse["body"]> {
+    return this.sendRequest("pause", args) as Promise<DebugProtocol.PauseResponse["body"]>;
   }
 
   /** ReadMemory request; value of command field is 'readMemory'.
         Reads bytes from memory at the provided location.
     */
-  public readMemory(args: DebugProtocol.ReadMemoryRequest["arguments"]): Promise<DebugProtocol.ReadMemoryResponse> {
-    return this.sendRequest("readMemory", args) as Promise<DebugProtocol.ReadMemoryResponse>;
+  public readMemory(args: DebugProtocol.ReadMemoryRequest["arguments"]): Promise<DebugProtocol.ReadMemoryResponse["body"]> {
+    return this.sendRequest("readMemory", args) as Promise<DebugProtocol.ReadMemoryResponse["body"]>;
   }
 
   /** Restart request; value of command field is 'restart'.
@@ -331,30 +331,30 @@ export abstract class BaseDebugClient {
         A debug adapter can override this default behaviour by implementing a restart request
         and setting the capability 'supportsRestartRequest' to true.
     */
-  public restart(args: DebugProtocol.RestartRequest["arguments"]): Promise<DebugProtocol.RestartResponse> {
-    return this.sendRequest("restart", args) as Promise<DebugProtocol.RestartResponse>;
+  public restart(args: DebugProtocol.RestartRequest["arguments"]): Promise<DebugProtocol.RestartResponse["body"]> {
+    return this.sendRequest("restart", args) as Promise<DebugProtocol.RestartResponse["body"]>;
   }
 
   /** RestartFrame request; value of command field is 'restartFrame'.
         The request restarts execution of the specified stackframe.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'restart') after the restart has completed.
     */
-  public restartFrame(args: DebugProtocol.RestartFrameRequest["arguments"]): Promise<DebugProtocol.RestartFrameResponse> {
-    return this.sendRequest("restartFrame", args) as Promise<DebugProtocol.RestartFrameResponse>;
+  public restartFrame(args: DebugProtocol.RestartFrameRequest["arguments"]): Promise<DebugProtocol.RestartFrameResponse["body"]> {
+    return this.sendRequest("restartFrame", args) as Promise<DebugProtocol.RestartFrameResponse["body"]>;
   }
 
   /** ReverseContinue request; value of command field is 'reverseContinue'.
         The request starts the debuggee to run backward. Clients should only call this request if the capability 'supportsStepBack' is true.
     */
-  public reverseContinue(args: DebugProtocol.ReverseContinueRequest["arguments"]): Promise<DebugProtocol.ReverseContinueResponse> {
-    return this.sendRequest("reverseContinue", args) as Promise<DebugProtocol.ReverseContinueResponse>;
+  public reverseContinue(args: DebugProtocol.ReverseContinueRequest["arguments"]): Promise<DebugProtocol.ReverseContinueResponse["body"]> {
+    return this.sendRequest("reverseContinue", args) as Promise<DebugProtocol.ReverseContinueResponse["body"]>;
   }
 
   /** Scopes request; value of command field is 'scopes'.
         The request returns the variable scopes for a given stackframe ID.
     */
-  public scopes(args: DebugProtocol.ScopesRequest["arguments"]): Promise<DebugProtocol.ScopesResponse> {
-    return this.sendRequest("scopes", args) as Promise<DebugProtocol.ScopesResponse>;
+  public scopes(args: DebugProtocol.ScopesRequest["arguments"]): Promise<DebugProtocol.ScopesResponse["body"]> {
+    return this.sendRequest("scopes", args) as Promise<DebugProtocol.ScopesResponse["body"]>;
   }
 
   /** SetBreakpoints request; value of command field is 'setBreakpoints'.
@@ -362,8 +362,8 @@ export abstract class BaseDebugClient {
         To clear all breakpoint for a source, specify an empty array.
         When a breakpoint is hit, a 'stopped' event (with reason 'breakpoint') is generated.
     */
-  public setBreakpoints(args: DebugProtocol.SetBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetBreakpointsResponse> {
-    return this.sendRequest("setBreakpoints", args) as Promise<DebugProtocol.SetBreakpointsResponse>;
+  public setBreakpoints(args: DebugProtocol.SetBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetBreakpointsResponse["body"]> {
+    return this.sendRequest("setBreakpoints", args) as Promise<DebugProtocol.SetBreakpointsResponse["body"]>;
   }
 
   /** SetDataBreakpoints request; value of command field is 'setDataBreakpoints'.
@@ -371,23 +371,23 @@ export abstract class BaseDebugClient {
         To clear all data breakpoints, specify an empty array.
         When a data breakpoint is hit, a 'stopped' event (with reason 'data breakpoint') is generated.
     */
-  public setDataBreakpoints(args: DebugProtocol.SetDataBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetDataBreakpointsResponse> {
-    return this.sendRequest("setDataBreakpoints", args) as Promise<DebugProtocol.SetDataBreakpointsResponse>;
+  public setDataBreakpoints(args: DebugProtocol.SetDataBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetDataBreakpointsResponse["body"]> {
+    return this.sendRequest("setDataBreakpoints", args) as Promise<DebugProtocol.SetDataBreakpointsResponse["body"]>;
   }
 
   /** SetExceptionBreakpoints request; value of command field is 'setExceptionBreakpoints'.
         The request configures the debuggers response to thrown exceptions. If an exception is configured to break, a 'stopped' event is fired (with reason 'exception').
     */
-  public setExceptionBreakpoints(args: DebugProtocol.SetExceptionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetExceptionBreakpointsResponse> {
-    return this.sendRequest("setExceptionBreakpoints", args) as Promise<DebugProtocol.SetExceptionBreakpointsResponse>;
+  public setExceptionBreakpoints(args: DebugProtocol.SetExceptionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetExceptionBreakpointsResponse["body"]> {
+    return this.sendRequest("setExceptionBreakpoints", args) as Promise<DebugProtocol.SetExceptionBreakpointsResponse["body"]>;
   }
 
   /** SetExpression request; value of command field is 'setExpression'.
         Evaluates the given 'value' expression and assigns it to the 'expression' which must be a modifiable l-value.
         The expressions have access to any variables and arguments that are in scope of the specified frame.
     */
-  public setExpression(args: DebugProtocol.SetExpressionRequest["arguments"]): Promise<DebugProtocol.SetExpressionResponse> {
-    return this.sendRequest("setExpression", args) as Promise<DebugProtocol.SetExpressionResponse>;
+  public setExpression(args: DebugProtocol.SetExpressionRequest["arguments"]): Promise<DebugProtocol.SetExpressionResponse["body"]> {
+    return this.sendRequest("setExpression", args) as Promise<DebugProtocol.SetExpressionResponse["body"]>;
   }
 
   /** SetFunctionBreakpoints request; value of command field is 'setFunctionBreakpoints'.
@@ -395,37 +395,37 @@ export abstract class BaseDebugClient {
         To clear all function breakpoints, specify an empty array.
         When a function breakpoint is hit, a 'stopped' event (with reason 'function breakpoint') is generated.
     */
-  public setFunctionBreakpoints(args: DebugProtocol.SetFunctionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetFunctionBreakpointsResponse> {
-    return this.sendRequest("setFunctionBreakpoints", args) as Promise<DebugProtocol.SetFunctionBreakpointsResponse>;
+  public setFunctionBreakpoints(args: DebugProtocol.SetFunctionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetFunctionBreakpointsResponse["body"]> {
+    return this.sendRequest("setFunctionBreakpoints", args) as Promise<DebugProtocol.SetFunctionBreakpointsResponse["body"]>;
   }
 
   /** SetVariable request; value of command field is 'setVariable'.
         Set the variable with the given name in the variable container to a new value.
     */
-  public setVariable(args: DebugProtocol.SetVariableRequest["arguments"]): Promise<DebugProtocol.SetVariableResponse> {
-    return this.sendRequest("setVariable", args) as Promise<DebugProtocol.SetVariableResponse>;
+  public setVariable(args: DebugProtocol.SetVariableRequest["arguments"]): Promise<DebugProtocol.SetVariableResponse["body"]> {
+    return this.sendRequest("setVariable", args) as Promise<DebugProtocol.SetVariableResponse["body"]>;
   }
 
   /** Source request; value of command field is 'source'.
         The request retrieves the source code for a given source reference.
     */
-  public source(args: DebugProtocol.SourceRequest["arguments"]): Promise<DebugProtocol.SourceResponse> {
-    return this.sendRequest("source", args) as Promise<DebugProtocol.SourceResponse>;
+  public source(args: DebugProtocol.SourceRequest["arguments"]): Promise<DebugProtocol.SourceResponse["body"]> {
+    return this.sendRequest("source", args) as Promise<DebugProtocol.SourceResponse["body"]>;
   }
 
   /** StackTrace request; value of command field is 'stackTrace'.
         The request returns a stacktrace from the current execution state.
     */
-  public stackTrace(args: DebugProtocol.StackTraceRequest["arguments"]): Promise<DebugProtocol.StackTraceResponse> {
-    return this.sendRequest("stackTrace", args) as Promise<DebugProtocol.StackTraceResponse>;
+  public stackTrace(args: DebugProtocol.StackTraceRequest["arguments"]): Promise<DebugProtocol.StackTraceResponse["body"]> {
+    return this.sendRequest("stackTrace", args) as Promise<DebugProtocol.StackTraceResponse["body"]>;
   }
 
   /** StepBack request; value of command field is 'stepBack'.
         The request starts the debuggee to run one step backwards.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed. Clients should only call this request if the capability 'supportsStepBack' is true.
     */
-  public stepBack(args: DebugProtocol.StepBackRequest["arguments"]): Promise<DebugProtocol.StepBackResponse> {
-    return this.sendRequest("stepBack", args) as Promise<DebugProtocol.StepBackResponse>;
+  public stepBack(args: DebugProtocol.StepBackRequest["arguments"]): Promise<DebugProtocol.StepBackResponse["body"]> {
+    return this.sendRequest("stepBack", args) as Promise<DebugProtocol.StepBackResponse["body"]>;
   }
 
   /** StepIn request; value of command field is 'stepIn'.
@@ -436,8 +436,8 @@ export abstract class BaseDebugClient {
         the optional argument 'targetId' can be used to control into which target the 'stepIn' should occur.
         The list of possible targets for a given source line can be retrieved via the 'stepInTargets' request.
     */
-  public stepIn(args: DebugProtocol.StepInRequest["arguments"]): Promise<DebugProtocol.StepInResponse> {
-    return this.sendRequest("stepIn", args) as Promise<DebugProtocol.StepInResponse>;
+  public stepIn(args: DebugProtocol.StepInRequest["arguments"]): Promise<DebugProtocol.StepInResponse["body"]> {
+    return this.sendRequest("stepIn", args) as Promise<DebugProtocol.StepInResponse["body"]>;
   }
 
   /** StepInTargets request; value of command field is 'stepInTargets'.
@@ -445,45 +445,45 @@ export abstract class BaseDebugClient {
         These targets can be used in the 'stepIn' request.
         The StepInTargets may only be called if the 'supportsStepInTargetsRequest' capability exists and is true.
     */
-  public stepInTargets(args: DebugProtocol.StepInTargetsRequest["arguments"]): Promise<DebugProtocol.StepInTargetsResponse> {
-    return this.sendRequest("stepInTargets", args) as Promise<DebugProtocol.StepInTargetsResponse>;
+  public stepInTargets(args: DebugProtocol.StepInTargetsRequest["arguments"]): Promise<DebugProtocol.StepInTargetsResponse["body"]> {
+    return this.sendRequest("stepInTargets", args) as Promise<DebugProtocol.StepInTargetsResponse["body"]>;
   }
 
   /** StepOut request; value of command field is 'stepOut'.
         The request starts the debuggee to run again for one step.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed.
     */
-  public stepOut(args: DebugProtocol.StepOutRequest["arguments"]): Promise<DebugProtocol.StepOutResponse> {
-    return this.sendRequest("stepOut", args) as Promise<DebugProtocol.StepOutResponse>;
+  public stepOut(args: DebugProtocol.StepOutRequest["arguments"]): Promise<DebugProtocol.StepOutResponse["body"]> {
+    return this.sendRequest("stepOut", args) as Promise<DebugProtocol.StepOutResponse["body"]>;
   }
 
   /** Terminate request; value of command field is 'terminate'.
         The 'terminate' request is sent from the client to the debug adapter in order to give the debuggee a chance for terminating itself.
     */
-  public terminate(args: DebugProtocol.TerminateRequest["arguments"]): Promise<DebugProtocol.TerminateResponse> {
-    return this.sendRequest("terminate", args) as Promise<DebugProtocol.TerminateResponse>;
+  public terminate(args: DebugProtocol.TerminateRequest["arguments"]): Promise<DebugProtocol.TerminateResponse["body"]> {
+    return this.sendRequest("terminate", args) as Promise<DebugProtocol.TerminateResponse["body"]>;
   }
 
   /** TerminateThreads request; value of command field is 'terminateThreads'.
         The request terminates the threads with the given ids.
     */
-  public terminateThreads(args: DebugProtocol.TerminateThreadsRequest["arguments"]): Promise<DebugProtocol.TerminateThreadsResponse> {
-    return this.sendRequest("terminateThreads", args) as Promise<DebugProtocol.TerminateThreadsResponse>;
+  public terminateThreads(args: DebugProtocol.TerminateThreadsRequest["arguments"]): Promise<DebugProtocol.TerminateThreadsResponse["body"]> {
+    return this.sendRequest("terminateThreads", args) as Promise<DebugProtocol.TerminateThreadsResponse["body"]>;
   }
 
   /** Threads request; value of command field is 'threads'.
         The request retrieves a list of all threads.
     */
-  public threads(args: DebugProtocol.ThreadsRequest["arguments"]): Promise<DebugProtocol.ThreadsResponse> {
-    return this.sendRequest("threads", args) as Promise<DebugProtocol.ThreadsResponse>;
+  public threads(args: DebugProtocol.ThreadsRequest["arguments"]): Promise<DebugProtocol.ThreadsResponse["body"]> {
+    return this.sendRequest("threads", args) as Promise<DebugProtocol.ThreadsResponse["body"]>;
   }
 
   /** Variables request; value of command field is 'variables'.
         Retrieves all child variables for the given variable reference.
         An optional filter can be used to limit the fetched children to either named or indexed children.
     */
-  public variables(args: DebugProtocol.VariablesRequest["arguments"]): Promise<DebugProtocol.VariablesResponse> {
-    return this.sendRequest("variables", args) as Promise<DebugProtocol.VariablesResponse>;
+  public variables(args: DebugProtocol.VariablesRequest["arguments"]): Promise<DebugProtocol.VariablesResponse["body"]> {
+    return this.sendRequest("variables", args) as Promise<DebugProtocol.VariablesResponse["body"]>;
   }
 
 
