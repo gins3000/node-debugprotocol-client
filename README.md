@@ -73,9 +73,6 @@ await client.attach<SpecificAttachArguments>({
   // ...
 });
 
-// send 'configuration done'
-await client.configurationDone();
-
 // set some breakpoints
 await client.setBreakpoints({
   breakpoints: [
@@ -99,6 +96,9 @@ const unsubscribable = client.onStopped((stoppedEvent) => {
     await client.continue({ threadId: 0 });
   }
 });
+
+// send 'configuration done' (in some debuggers this will trigger 'continue' if attach was awaited)
+await client.configurationDone();
 
 // ...
 
