@@ -6,7 +6,7 @@ import { Unsubscribable } from "./utils";
 
 export type EventHandler<T extends DebugProtocol.Event> = (event: T["body"]) => void;
 
-export type ReverseRequestHandler<T extends DebugProtocol.Request, R extends DebugProtocol.Response> = (args: T["arguments"]) => Promise<R>;
+export type ReverseRequestHandler<T extends DebugProtocol.Request, R extends DebugProtocol.Response> = (args: T["arguments"]) => Promise<R["body"]>;
 
 export enum LogLevel {
   Off = 0,
