@@ -23,7 +23,7 @@ This repository hosts a standalone NodeJS client library for the Debug Adapter P
 
 Install to your node project:
 ```shell
-npm install gins3000/node-debugprotocol-client
+npm install node-debugprotocol-client
 ```
 
 
