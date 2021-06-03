@@ -181,7 +181,8 @@ export abstract class BaseDebugClient {
 
   // Requests
   /** Attach request; value of command field is 'attach'.
-        The attach request is sent from the client to the debug adapter to attach to a debuggee that is already running. Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
+        The attach request is sent from the client to the debug adapter to attach to a debuggee that is already running.
+        Since attaching is debugger/runtime specific, the arguments for this request are not part of this specification.
     */
   public attach<T extends DebugProtocol.AttachRequest["arguments"]>(args: T): Promise<DebugProtocol.AttachResponse["body"]> {
     return this.sendRequest("attach", args) as Promise<DebugProtocol.AttachResponse["body"]>;
@@ -189,6 +190,7 @@ export abstract class BaseDebugClient {
 
   /** BreakpointLocations request; value of command field is 'breakpointLocations'.
         The 'breakpointLocations' request returns all possible locations for source breakpoints in a given range.
+        Clients should only call this request if the capability 'supportsBreakpointLocationsRequest' is true.
     */
   public breakpointLocations(args: DebugProtocol.BreakpointLocationsRequest["arguments"]): Promise<DebugProtocol.BreakpointLocationsResponse["body"]> {
     return this.sendRequest("breakpointLocations", args) as Promise<DebugProtocol.BreakpointLocationsResponse["body"]>;
@@ -196,14 +198,16 @@ export abstract class BaseDebugClient {
 
   /** Completions request; value of command field is 'completions'.
         Returns a list of possible completions for a given caret position and text.
-        The CompletionsRequest may only be called if the 'supportsCompletionsRequest' capability exists and is true.
+        Clients should only call this request if the capability 'supportsCompletionsRequest' is true.
     */
   public completions(args: DebugProtocol.CompletionsRequest["arguments"]): Promise<DebugProtocol.CompletionsResponse["body"]> {
     return this.sendRequest("completions", args) as Promise<DebugProtocol.CompletionsResponse["body"]>;
   }
 
   /** ConfigurationDone request; value of command field is 'configurationDone'.
-        The client of the debug protocol must send this request at the end of the sequence of configuration requests (which was started by the 'initialized' event).
+        This optional request indicates that the client has finished initialization of the debug adapter.
+        So it is the last request in the sequence of configuration requests (which was started by the 'initialized' event).
+        Clients should only call this request if the capability 'supportsConfigurationDoneRequest' is true.
     */
   public configurationDone(args: DebugProtocol.ConfigurationDoneRequest["arguments"]): Promise<DebugProtocol.ConfigurationDoneResponse["body"]> {
     return this.sendRequest("configurationDone", args) as Promise<DebugProtocol.ConfigurationDoneResponse["body"]>;
@@ -218,6 +222,7 @@ export abstract class BaseDebugClient {
 
   /** DataBreakpointInfo request; value of command field is 'dataBreakpointInfo'.
         Obtains information on a possible data breakpoint that could be set on an expression or variable.
+        Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
     */
   public dataBreakpointInfo(args: DebugProtocol.DataBreakpointInfoRequest["arguments"]): Promise<DebugProtocol.DataBreakpointInfoResponse["body"]> {
     return this.sendRequest("dataBreakpointInfo", args) as Promise<DebugProtocol.DataBreakpointInfoResponse["body"]>;
@@ -225,13 +230,18 @@ export abstract class BaseDebugClient {
 
   /** Disassemble request; value of command field is 'disassemble'.
         Disassembles code stored at the provided location.
+        Clients should only call this request if the capability 'supportsDisassembleRequest' is true.
     */
   public disassemble(args: DebugProtocol.DisassembleRequest["arguments"]): Promise<DebugProtocol.DisassembleResponse["body"]> {
     return this.sendRequest("disassemble", args) as Promise<DebugProtocol.DisassembleResponse["body"]>;
   }
 
   /** Disconnect request; value of command field is 'disconnect'.
-        The 'disconnect' request is sent from the client to the debug adapter in order to stop debugging. It asks the debug adapter to disconnect from the debuggee and to terminate the debug adapter. If the debuggee has been started with the 'launch' request, the 'disconnect' request terminates the debuggee. If the 'attach' request was used to connect to the debuggee, 'disconnect' does not terminate the debuggee. This behavior can be controlled with the 'terminateDebuggee' argument (if supported by the debug adapter).
+        The 'disconnect' request is sent from the client to the debug adapter in order to stop debugging.
+        It asks the debug adapter to disconnect from the debuggee and to terminate the debug adapter.
+        If the debuggee has been started with the 'launch' request, the 'disconnect' request terminates the debuggee.
+        If the 'attach' request was used to connect to the debuggee, 'disconnect' does not terminate the debuggee.
+        This behavior can be controlled with the 'terminateDebuggee' argument (if supported by the debug adapter).
     */
   public disconnect(args: DebugProtocol.DisconnectRequest["arguments"]): Promise<DebugProtocol.DisconnectResponse["body"]> {
     return this.sendRequest("disconnect", args) as Promise<DebugProtocol.DisconnectResponse["body"]>;
@@ -247,6 +257,7 @@ export abstract class BaseDebugClient {
 
   /** ExceptionInfo request; value of command field is 'exceptionInfo'.
         Retrieves the details of the exception that caused this event to be raised.
+        Clients should only call this request if the capability 'supportsExceptionInfoRequest' is true.
     */
   public exceptionInfo(args: DebugProtocol.ExceptionInfoRequest["arguments"]): Promise<DebugProtocol.ExceptionInfoResponse["body"]> {
     return this.sendRequest("exceptionInfo", args) as Promise<DebugProtocol.ExceptionInfoResponse["body"]>;
@@ -257,6 +268,7 @@ export abstract class BaseDebugClient {
         This makes it possible to skip the execution of code or to executed code again.
         The code between the current location and the goto target is not executed but skipped.
         The debug adapter first sends the response and then a 'stopped' event with reason 'goto'.
+        Clients should only call this request if the capability 'supportsGotoTargetsRequest' is true (because only then goto targets exist that can be passed as arguments).
     */
   public goto(args: DebugProtocol.GotoRequest["arguments"]): Promise<DebugProtocol.GotoResponse["body"]> {
     return this.sendRequest("goto", args) as Promise<DebugProtocol.GotoResponse["body"]>;
@@ -265,15 +277,17 @@ export abstract class BaseDebugClient {
   /** GotoTargets request; value of command field is 'gotoTargets'.
         This request retrieves the possible goto targets for the specified source location.
         These targets can be used in the 'goto' request.
-        The GotoTargets request may only be called if the 'supportsGotoTargetsRequest' capability exists and is true.
+        Clients should only call this request if the capability 'supportsGotoTargetsRequest' is true.
     */
   public gotoTargets(args: DebugProtocol.GotoTargetsRequest["arguments"]): Promise<DebugProtocol.GotoTargetsResponse["body"]> {
     return this.sendRequest("gotoTargets", args) as Promise<DebugProtocol.GotoTargetsResponse["body"]>;
   }
 
   /** Initialize request; value of command field is 'initialize'.
-        The 'initialize' request is sent as the first request from the client to the debug adapter in order to configure it with client capabilities and to retrieve capabilities from the debug adapter.
-        Until the debug adapter has responded to with an 'initialize' response, the client must not send any additional requests or events to the debug adapter. In addition the debug adapter is not allowed to send any requests or events to the client until it has responded with an 'initialize' response.
+        The 'initialize' request is sent as the first request from the client to the debug adapter
+        in order to configure it with client capabilities and to retrieve capabilities from the debug adapter.
+        Until the debug adapter has responded to with an 'initialize' response, the client must not send any additional requests or events to the debug adapter.
+        In addition the debug adapter is not allowed to send any requests or events to the client until it has responded with an 'initialize' response.
         The 'initialize' request may only be sent once.
     */
   public initialize(args: DebugProtocol.InitializeRequest["arguments"]): Promise<DebugProtocol.InitializeResponse["body"]> {
@@ -281,7 +295,8 @@ export abstract class BaseDebugClient {
   }
 
   /** Launch request; value of command field is 'launch'.
-        The launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true). Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
+        This launch request is sent from the client to the debug adapter to start the debuggee with or without debugging (if 'noDebug' is true).
+        Since launching is debugger/runtime specific, the arguments for this request are not part of this specification.
     */
   public launch<T extends DebugProtocol.LaunchRequest["arguments"]>(args: T): Promise<DebugProtocol.LaunchResponse["body"]> {
     return this.sendRequest("launch", args) as Promise<DebugProtocol.LaunchResponse["body"]>;
@@ -289,13 +304,15 @@ export abstract class BaseDebugClient {
 
   /** LoadedSources request; value of command field is 'loadedSources'.
         Retrieves the set of all sources currently loaded by the debugged process.
+        Clients should only call this request if the capability 'supportsLoadedSourcesRequest' is true.
     */
   public loadedSources(args: DebugProtocol.LoadedSourcesRequest["arguments"]): Promise<DebugProtocol.LoadedSourcesResponse["body"]> {
     return this.sendRequest("loadedSources", args) as Promise<DebugProtocol.LoadedSourcesResponse["body"]>;
   }
 
   /** Modules request; value of command field is 'modules'.
-        Modules can be retrieved from the debug adapter with the ModulesRequest which can either return all modules or a range of modules to support paging.
+        Modules can be retrieved from the debug adapter with this request which can either return all modules or a range of modules to support paging.
+        Clients should only call this request if the capability 'supportsModulesRequest' is true.
     */
   public modules(args: DebugProtocol.ModulesRequest["arguments"]): Promise<DebugProtocol.ModulesResponse["body"]> {
     return this.sendRequest("modules", args) as Promise<DebugProtocol.ModulesResponse["body"]>;
@@ -319,16 +336,15 @@ export abstract class BaseDebugClient {
 
   /** ReadMemory request; value of command field is 'readMemory'.
         Reads bytes from memory at the provided location.
+        Clients should only call this request if the capability 'supportsReadMemoryRequest' is true.
     */
   public readMemory(args: DebugProtocol.ReadMemoryRequest["arguments"]): Promise<DebugProtocol.ReadMemoryResponse["body"]> {
     return this.sendRequest("readMemory", args) as Promise<DebugProtocol.ReadMemoryResponse["body"]>;
   }
 
   /** Restart request; value of command field is 'restart'.
-        Restarts a debug session. If the capability 'supportsRestartRequest' is missing or has the value false,
-        the client will implement 'restart' by terminating the debug adapter first and then launching it anew.
-        A debug adapter can override this default behaviour by implementing a restart request
-        and setting the capability 'supportsRestartRequest' to true.
+        Restarts a debug session. Clients should only call this request if the capability 'supportsRestartRequest' is true.
+        If the capability is missing or has the value false, a typical client will emulate 'restart' by terminating the debug adapter first and then launching it anew.
     */
   public restart(args: DebugProtocol.RestartRequest["arguments"]): Promise<DebugProtocol.RestartResponse["body"]> {
     return this.sendRequest("restart", args) as Promise<DebugProtocol.RestartResponse["body"]>;
@@ -337,13 +353,15 @@ export abstract class BaseDebugClient {
   /** RestartFrame request; value of command field is 'restartFrame'.
         The request restarts execution of the specified stackframe.
         The debug adapter first sends the response and then a 'stopped' event (with reason 'restart') after the restart has completed.
+        Clients should only call this request if the capability 'supportsRestartFrame' is true.
     */
   public restartFrame(args: DebugProtocol.RestartFrameRequest["arguments"]): Promise<DebugProtocol.RestartFrameResponse["body"]> {
     return this.sendRequest("restartFrame", args) as Promise<DebugProtocol.RestartFrameResponse["body"]>;
   }
 
   /** ReverseContinue request; value of command field is 'reverseContinue'.
-        The request starts the debuggee to run backward. Clients should only call this request if the capability 'supportsStepBack' is true.
+        The request starts the debuggee to run backward.
+        Clients should only call this request if the capability 'supportsStepBack' is true.
     */
   public reverseContinue(args: DebugProtocol.ReverseContinueRequest["arguments"]): Promise<DebugProtocol.ReverseContinueResponse["body"]> {
     return this.sendRequest("reverseContinue", args) as Promise<DebugProtocol.ReverseContinueResponse["body"]>;
@@ -369,13 +387,16 @@ export abstract class BaseDebugClient {
         Replaces all existing data breakpoints with new data breakpoints.
         To clear all data breakpoints, specify an empty array.
         When a data breakpoint is hit, a 'stopped' event (with reason 'data breakpoint') is generated.
+        Clients should only call this request if the capability 'supportsDataBreakpoints' is true.
     */
   public setDataBreakpoints(args: DebugProtocol.SetDataBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetDataBreakpointsResponse["body"]> {
     return this.sendRequest("setDataBreakpoints", args) as Promise<DebugProtocol.SetDataBreakpointsResponse["body"]>;
   }
 
   /** SetExceptionBreakpoints request; value of command field is 'setExceptionBreakpoints'.
-        The request configures the debuggers response to thrown exceptions. If an exception is configured to break, a 'stopped' event is fired (with reason 'exception').
+        The request configures the debuggers response to thrown exceptions.
+        If an exception is configured to break, a 'stopped' event is fired (with reason 'exception').
+        Clients should only call this request if the capability 'exceptionBreakpointFilters' returns one or more filters.
     */
   public setExceptionBreakpoints(args: DebugProtocol.SetExceptionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetExceptionBreakpointsResponse["body"]> {
     return this.sendRequest("setExceptionBreakpoints", args) as Promise<DebugProtocol.SetExceptionBreakpointsResponse["body"]>;
@@ -384,6 +405,7 @@ export abstract class BaseDebugClient {
   /** SetExpression request; value of command field is 'setExpression'.
         Evaluates the given 'value' expression and assigns it to the 'expression' which must be a modifiable l-value.
         The expressions have access to any variables and arguments that are in scope of the specified frame.
+        Clients should only call this request if the capability 'supportsSetExpression' is true.
     */
   public setExpression(args: DebugProtocol.SetExpressionRequest["arguments"]): Promise<DebugProtocol.SetExpressionResponse["body"]> {
     return this.sendRequest("setExpression", args) as Promise<DebugProtocol.SetExpressionResponse["body"]>;
@@ -393,13 +415,24 @@ export abstract class BaseDebugClient {
         Replaces all existing function breakpoints with new function breakpoints.
         To clear all function breakpoints, specify an empty array.
         When a function breakpoint is hit, a 'stopped' event (with reason 'function breakpoint') is generated.
+        Clients should only call this request if the capability 'supportsFunctionBreakpoints' is true.
     */
   public setFunctionBreakpoints(args: DebugProtocol.SetFunctionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetFunctionBreakpointsResponse["body"]> {
     return this.sendRequest("setFunctionBreakpoints", args) as Promise<DebugProtocol.SetFunctionBreakpointsResponse["body"]>;
   }
 
+  /** SetInstructionBreakpoints request; value of command field is 'setInstructionBreakpoints'.
+        Replaces all existing instruction breakpoints. Typically, instruction breakpoints would be set from a diassembly window.
+        To clear all instruction breakpoints, specify an empty array.
+        When an instruction breakpoint is hit, a 'stopped' event (with reason 'instruction breakpoint') is generated.
+        Clients should only call this request if the capability 'supportsInstructionBreakpoints' is true.
+    */
+  public setInstructionBreakpoints(args: DebugProtocol.SetInstructionBreakpointsRequest["arguments"]): Promise<DebugProtocol.SetInstructionBreakpointsResponse["body"]> {
+    return this.sendRequest("setInstructionBreakpoints", args) as Promise<DebugProtocol.SetInstructionBreakpointsResponse["body"]>;
+  }
+
   /** SetVariable request; value of command field is 'setVariable'.
-        Set the variable with the given name in the variable container to a new value.
+        Set the variable with the given name in the variable container to a new value. Clients should only call this request if the capability 'supportsSetVariable' is true.
     */
   public setVariable(args: DebugProtocol.SetVariableRequest["arguments"]): Promise<DebugProtocol.SetVariableResponse["body"]> {
     return this.sendRequest("setVariable", args) as Promise<DebugProtocol.SetVariableResponse["body"]>;
@@ -413,7 +446,8 @@ export abstract class BaseDebugClient {
   }
 
   /** StackTrace request; value of command field is 'stackTrace'.
-        The request returns a stacktrace from the current execution state.
+        The request returns a stacktrace from the current execution state of a given thread.
+        A client can request all stack frames by omitting the startFrame and levels arguments. For performance conscious clients and if the debug adapter's 'supportsDelayedStackTraceLoading' capability is true, stack frames can be retrieved in a piecemeal way with the startFrame and levels arguments. The response of the stackTrace request may contain a totalFrames property that hints at the total number of frames in the stack. If a client needs this total number upfront, it can issue a request for a single (first) frame and depending on the value of totalFrames decide how to proceed. In any case a client should be prepared to receive less frames than requested, which is an indication that the end of the stack has been reached.
     */
   public stackTrace(args: DebugProtocol.StackTraceRequest["arguments"]): Promise<DebugProtocol.StackTraceResponse["body"]> {
     return this.sendRequest("stackTrace", args) as Promise<DebugProtocol.StackTraceResponse["body"]>;
@@ -421,7 +455,8 @@ export abstract class BaseDebugClient {
 
   /** StepBack request; value of command field is 'stepBack'.
         The request starts the debuggee to run one step backwards.
-        The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed. Clients should only call this request if the capability 'supportsStepBack' is true.
+        The debug adapter first sends the response and then a 'stopped' event (with reason 'step') after the step has completed.
+        Clients should only call this request if the capability 'supportsStepBack' is true.
     */
   public stepBack(args: DebugProtocol.StepBackRequest["arguments"]): Promise<DebugProtocol.StepBackResponse["body"]> {
     return this.sendRequest("stepBack", args) as Promise<DebugProtocol.StepBackResponse["body"]>;
@@ -443,6 +478,7 @@ export abstract class BaseDebugClient {
         This request retrieves the possible stepIn targets for the specified stack frame.
         These targets can be used in the 'stepIn' request.
         The StepInTargets may only be called if the 'supportsStepInTargetsRequest' capability exists and is true.
+        Clients should only call this request if the capability 'supportsStepInTargetsRequest' is true.
     */
   public stepInTargets(args: DebugProtocol.StepInTargetsRequest["arguments"]): Promise<DebugProtocol.StepInTargetsResponse["body"]> {
     return this.sendRequest("stepInTargets", args) as Promise<DebugProtocol.StepInTargetsResponse["body"]>;
@@ -458,6 +494,7 @@ export abstract class BaseDebugClient {
 
   /** Terminate request; value of command field is 'terminate'.
         The 'terminate' request is sent from the client to the debug adapter in order to give the debuggee a chance for terminating itself.
+        Clients should only call this request if the capability 'supportsTerminateRequest' is true.
     */
   public terminate(args: DebugProtocol.TerminateRequest["arguments"]): Promise<DebugProtocol.TerminateResponse["body"]> {
     return this.sendRequest("terminate", args) as Promise<DebugProtocol.TerminateResponse["body"]>;
@@ -465,6 +502,7 @@ export abstract class BaseDebugClient {
 
   /** TerminateThreads request; value of command field is 'terminateThreads'.
         The request terminates the threads with the given ids.
+        Clients should only call this request if the capability 'supportsTerminateThreadsRequest' is true.
     */
   public terminateThreads(args: DebugProtocol.TerminateThreadsRequest["arguments"]): Promise<DebugProtocol.TerminateThreadsResponse["body"]> {
     return this.sendRequest("terminateThreads", args) as Promise<DebugProtocol.TerminateThreadsResponse["body"]>;
@@ -527,13 +565,22 @@ export abstract class BaseDebugClient {
         The sequence of events/requests is as follows:
         - adapters sends 'initialized' event (after the 'initialize' request has returned)
         - frontend sends zero or more 'setBreakpoints' requests
-        - frontend sends one 'setFunctionBreakpoints' request
+        - frontend sends one 'setFunctionBreakpoints' request (if capability 'supportsFunctionBreakpoints' is true)
         - frontend sends a 'setExceptionBreakpoints' request if one or more 'exceptionBreakpointFilters' have been defined (or if 'supportsConfigurationDoneRequest' is not defined or false)
         - frontend sends other future configuration requests
         - frontend sends one 'configurationDone' request to indicate the end of the configuration.
     */
   public onInitialized(callback: EventHandler<DebugProtocol.InitializedEvent>, once = false): Unsubscribable {
     return this.onEvent("initialized", callback, once);
+  }
+
+  /** Event message for 'invalidated' event type.
+        This event signals that some state in the debug adapter has changed and requires that the client needs to re-render the data snapshot previously requested.
+        Debug adapters do not have to emit this event for runtime changes like stopped or thread events because in that case the client refetches the new state anyway. But the event can be used for example to refresh the UI after rendering formatting has changed in the debug adapter.
+        This event should only be sent if the debug adapter has received a value true for the 'supportsInvalidatedEvent' capability of the 'initialize' request.
+    */
+  public onInvalidated(callback: EventHandler<DebugProtocol.InvalidatedEvent>, once = false): Unsubscribable {
+    return this.onEvent("invalidated", callback, once);
   }
 
   /** Event message for 'loadedSource' event type.
@@ -564,9 +611,36 @@ export abstract class BaseDebugClient {
     return this.onEvent("process", callback, once);
   }
 
+  /** Event message for 'progressEnd' event type.
+        The event signals the end of the progress reporting with an optional final message.
+        This event should only be sent if the client has passed the value true for the 'supportsProgressReporting' capability of the 'initialize' request.
+    */
+  public onProgressEnd(callback: EventHandler<DebugProtocol.ProgressEndEvent>, once = false): Unsubscribable {
+    return this.onEvent("progressEnd", callback, once);
+  }
+
+  /** Event message for 'progressStart' event type.
+        The event signals that a long running operation is about to start and
+        provides additional information for the client to set up a corresponding progress and cancellation UI.
+        The client is free to delay the showing of the UI in order to reduce flicker.
+        This event should only be sent if the client has passed the value true for the 'supportsProgressReporting' capability of the 'initialize' request.
+    */
+  public onProgressStart(callback: EventHandler<DebugProtocol.ProgressStartEvent>, once = false): Unsubscribable {
+    return this.onEvent("progressStart", callback, once);
+  }
+
+  /** Event message for 'progressUpdate' event type.
+        The event signals that the progress reporting needs to updated with a new message and/or percentage.
+        The client does not have to update the UI immediately, but the clients needs to keep track of the message and/or percentage values.
+        This event should only be sent if the client has passed the value true for the 'supportsProgressReporting' capability of the 'initialize' request.
+    */
+  public onProgressUpdate(callback: EventHandler<DebugProtocol.ProgressUpdateEvent>, once = false): Unsubscribable {
+    return this.onEvent("progressUpdate", callback, once);
+  }
+
   /** Event message for 'stopped' event type.
         The event indicates that the execution of the debuggee has stopped due to some condition.
-        This can be caused by a break point previously set, a stepping action has completed, by executing a debugger statement etc.
+        This can be caused by a break point previously set, a stepping request has completed, by executing a debugger statement etc.
     */
   public onStopped(callback: EventHandler<DebugProtocol.StoppedEvent>, once = false): Unsubscribable {
     return this.onEvent("stopped", callback, once);
