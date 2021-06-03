@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2021-06-03
+- Support vscode-debugprotocol v1.47.0
+- switch to eslint
+- upgrade various dependencies including typescript
+
 ## [0.1.1] - 2020-01-14
 - Update docs
 
