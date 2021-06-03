@@ -7,7 +7,7 @@ import { CONTENT_LENGTH_HEADER, encodeMessage, TWO_CRLF } from "./protocol";
 export class StreamDebugClient extends BaseDebugClient {
 
   static DEFAULT_CONFIG: Required<BaseDebugClientConfig> = Object.assign({}, BaseDebugClient.DEFAULT_CONFIG, {
-    loggerName: "StreamDebugAdapterClient"
+    loggerName: "StreamDebugAdapterClient",
   });
 
   protected connection?: {
@@ -19,7 +19,7 @@ export class StreamDebugClient extends BaseDebugClient {
   protected buffer = Buffer.alloc(0);
   protected contentLength = -1;
 
-  public connectAdapter(readable: Readable, writable: Writable) {
+  public connectAdapter(readable: Readable, writable: Writable): void {
     if (this.connection) {
       throw new Error("already connected");
     }
@@ -27,13 +27,13 @@ export class StreamDebugClient extends BaseDebugClient {
     this.connection = {
       inStream: readable,
       outStream: writable,
-      handleData: this.handleData.bind(this)
+      handleData: this.handleData.bind(this),
     };
 
     readable.on("data", this.connection.handleData);
   }
 
-  public disconnectAdapter() {
+  public disconnectAdapter(): void {
     if (this.connection) {
       this.log("Disconnecting");
       this.connection.inStream.off("data", this.connection.handleData);
@@ -49,26 +49,26 @@ export class StreamDebugClient extends BaseDebugClient {
     return super.sendRequest(command, args);
   }
 
-  public sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]) {
+  public sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]): Promise<void> {
     if (!this.connection) { throw new Error("not connected"); }
     return super.sendResponse(request, responseBody);
   }
 
-  public sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message) {
+  public sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message): Promise<void> {
     if (!this.connection) { throw new Error("not connected"); }
     return super.sendErrorResponse(request, message, error);
   }
 
-  public sendMessage<T extends DebugProtocol.ProtocolMessage>(message: T) {
+  public sendMessage<T extends DebugProtocol.ProtocolMessage>(message: T): void {
     if (!this.connection) { throw new Error("not connected"); }
 
     this.connection.outStream.write(encodeMessage(message));
   }
 
-  protected handleData(data: Buffer) {
+  protected handleData(data: Buffer): void {
     this.buffer = Buffer.concat([this.buffer, data]);
 
-    while (true) {
+    for (;;) {
       if (this.contentLength >= 0) {
         if (this.buffer.length >= this.contentLength) {
           const body = this.buffer.toString("utf8", 0, this.contentLength);

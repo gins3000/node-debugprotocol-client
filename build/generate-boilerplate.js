@@ -11,7 +11,7 @@ function extractRequestTypes() {
   // matches /** <Documentation> */ interface <Command>Request extends Request)
   return extractTypes(/(?:(\/\*\*(?:(?!\*\/)[\s\S])+\*\/)[\s]*)?interface (\w*)Request extends Request/gm, [
     "RunInTerminal",
-    "Cancel"
+    "Cancel",
   ]);
 }
 
@@ -29,7 +29,7 @@ async function extractTypes(regex, blacklist) {
     if (!blacklist.includes(match[2])) {
       result.push({
         docs: match[1],
-        name: match[2]
+        name: match[2],
       });
     }
   }
@@ -44,7 +44,7 @@ async function generateRequestMethods() {
   requests.forEach(({ docs, name }) => {
     const firstLower = lowerFirst(name);
     if (docs) {
-      result += `  ${docs}\n`
+      result += `  ${docs}\n`;
     }
 
     if (["Attach", "Launch"].includes(name)) {
@@ -69,7 +69,7 @@ async function generateEventMethods() {
   events.forEach(({ docs, name }) => {
     const firstLower = lowerFirst(name);
     if (docs) {
-      result += `  ${docs}\n`
+      result += `  ${docs}\n`;
     }
 
     result += `  public on${name}(callback: EventHandler<DebugProtocol.${name}Event>, once = false): Unsubscribable {

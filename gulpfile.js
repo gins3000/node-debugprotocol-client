@@ -39,6 +39,6 @@ gulp.task("build", () => buildTypeScript());
 gulp.task("watch", gulp.series(
   gulp.series("build"),
   () => {
-    gulp.watch("src/**/*.ts", gulp.series("build"))
+    gulp.watch("src/**/*.ts", gulp.series("build"));
   })
 );

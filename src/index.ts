@@ -1,11 +1,11 @@
 export {
   SocketDebugClient,
   SocketDebugAdapterClientConfig,
-  ConnectionState
+  ConnectionState,
 } from "./socket-debug-client";
 
 export {
-  StreamDebugClient
+  StreamDebugClient,
 } from "./stream-debug-client";
 
 export {
@@ -13,7 +13,7 @@ export {
   BaseDebugClientConfig,
   EventHandler,
   LogLevel,
-  ReverseRequestHandler
+  ReverseRequestHandler,
 } from "./base-debug-client";
 
 export {
@@ -26,9 +26,9 @@ export {
   encodeMessage,
   isEvent,
   isRequest,
-  isResponse
+  isResponse,
 } from "./protocol";
 
 export {
-  Unsubscribable
+  Unsubscribable,
 } from "./utils";

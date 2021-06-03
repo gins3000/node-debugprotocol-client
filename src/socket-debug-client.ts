@@ -1,4 +1,5 @@
 import * as net from "net";
+import { DebugProtocol } from "vscode-debugprotocol";
 
 import { BaseDebugClientConfig } from "./base-debug-client";
 import { StreamDebugClient } from "./stream-debug-client";
@@ -6,7 +7,7 @@ import { StreamDebugClient } from "./stream-debug-client";
 export enum ConnectionState {
   Disconnected = 0,
   Connecting = 1,
-  Connected = 2
+  Connected = 2,
 }
 
 export interface SocketDebugAdapterClientConfig extends BaseDebugClientConfig {
@@ -19,7 +20,7 @@ export class SocketDebugClient extends StreamDebugClient {
   static DEFAULT_CONFIG: Required<SocketDebugAdapterClientConfig> = Object.assign({}, {
     host: "0.0.0.0",
     port: 12345,
-    loggerName: "SocketDebugAdapterClient"
+    loggerName: "SocketDebugAdapterClient",
   }, StreamDebugClient.DEFAULT_CONFIG);
 
   protected config: Required<SocketDebugAdapterClientConfig>;
@@ -36,7 +37,7 @@ export class SocketDebugClient extends StreamDebugClient {
     this.state = ConnectionState.Disconnected;
   }
 
-  public async connectAdapter() {
+  public async connectAdapter(): Promise<void> {
     try {
       if (this.state !== ConnectionState.Disconnected) {
         throw new Error(`already '${ConnectionState[this.state]}'`);
@@ -66,7 +67,7 @@ export class SocketDebugClient extends StreamDebugClient {
     }
   }
 
-  public disconnectAdapter() {
+  public disconnectAdapter(): void {
     if (this.socket) {
       super.disconnectAdapter();
       this.socket.destroy();
@@ -74,8 +75,7 @@ export class SocketDebugClient extends StreamDebugClient {
     }
   }
 
-  // tslint:disable-next-line:no-any
-  public async sendRequest(command: string, args?: any) {
+  public async sendRequest(command: string, args?: unknown): Promise<DebugProtocol.Response> {
     if (this.state !== ConnectionState.Connected) {
       throw new Error("not connected");
     }

@@ -11,7 +11,7 @@ export type ReverseRequestHandler<T extends DebugProtocol.Request, R extends Deb
 export enum LogLevel {
   Off = 0,
   On = 1,
-  Verbose = 2
+  Verbose = 2,
 }
 
 export interface BaseDebugClientConfig {
@@ -25,14 +25,14 @@ export abstract class BaseDebugClient {
   static DEFAULT_CONFIG: Required<BaseDebugClientConfig> = {
     loggerName: "DebugAdapterClient",
     logLevel: LogLevel.Off,
-    logger: console.log
+    logger: console.log,
   };
 
   protected config: Required<BaseDebugClientConfig>;
 
   private nextSeq = 1;
   private pendingRequests = new Map<number, (response: DebugProtocol.Response) => void>();
-  // tslint:disable-next-line:no-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private reverseRequestHandlers = new Map<string, ReverseRequestHandler<any, any>>();
   private eventEmitter = new EventEmitter();
 
@@ -44,7 +44,7 @@ export abstract class BaseDebugClient {
     return this.nextSeq++;
   }
 
-  protected handleMessage(message: DebugProtocol.ProtocolMessage) {
+  protected handleMessage(message: DebugProtocol.ProtocolMessage): void {
     if (isResponse(message)) {
       // send response back to sender
       const callback = this.pendingRequests.get(message.request_seq);
@@ -77,8 +77,7 @@ export abstract class BaseDebugClient {
     }
   }
 
-  // tslint:disable-next-line:no-any
-  protected log(message: string, detail?: any) {
+  protected log(message: string, detail?: unknown): void {
     if (this.config.logLevel === LogLevel.Off) { return; }
 
     const detailMessage = this.config.logLevel !== LogLevel.Verbose || typeof detail === "undefined"
@@ -97,7 +96,7 @@ export abstract class BaseDebugClient {
       seq,
       type: "request",
       command,
-      arguments: args
+      arguments: args,
     };
 
     this.log(`sending request '${request.command}' (${request.seq})`, request.arguments);
@@ -119,7 +118,7 @@ export abstract class BaseDebugClient {
     return responsePromise;
   }
 
-  public async sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]) {
+  public async sendResponse(request: DebugProtocol.Request, responseBody: DebugProtocol.Response["body"]): Promise<void> {
     const response = {
       type: "response",
       seq: this.getNextSeq(),
@@ -128,7 +127,7 @@ export abstract class BaseDebugClient {
       request_seq: request.seq,
       success: true,
 
-      body: responseBody
+      body: responseBody,
     };
 
     this.log(`sending response '${response.command}' (${response.seq})`, response.body);
@@ -136,7 +135,7 @@ export abstract class BaseDebugClient {
     this.sendMessage(response);
   }
 
-  public async sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message) {
+  public async sendErrorResponse(request: DebugProtocol.Request, message: string, error?: DebugProtocol.Message): Promise<void> {
     const response: DebugProtocol.ErrorResponse = {
       type: "response",
       seq: this.getNextSeq(),
@@ -147,8 +146,8 @@ export abstract class BaseDebugClient {
 
       message,
       body: {
-        error
-      }
+        error,
+      },
     };
 
     this.log(`sending error response '${response.command}' (${response.seq}) ${response.message}`, response.body);
@@ -162,7 +161,7 @@ export abstract class BaseDebugClient {
       : this.eventEmitter.on(event, callback);
 
     return {
-      unsubscribe: () => this.eventEmitter.off(event, callback)
+      unsubscribe: () => this.eventEmitter.off(event, callback),
     };
   }
 
@@ -174,7 +173,7 @@ export abstract class BaseDebugClient {
         if (this.reverseRequestHandlers.get(command) === callback) {
           this.reverseRequestHandlers.delete(command);
         }
-      }
+      },
     };
   }
 
