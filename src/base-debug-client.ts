@@ -406,6 +406,7 @@ export abstract class BaseDebugClient {
         Evaluates the given 'value' expression and assigns it to the 'expression' which must be a modifiable l-value.
         The expressions have access to any variables and arguments that are in scope of the specified frame.
         Clients should only call this request if the capability 'supportsSetExpression' is true.
+        If a debug adapter implements both setExpression and setVariable, a client will only use setExpression if the variable has an evaluateName property.
     */
   public setExpression(args: DebugProtocol.SetExpressionRequest["arguments"]): Promise<DebugProtocol.SetExpressionResponse["body"]> {
     return this.sendRequest("setExpression", args) as Promise<DebugProtocol.SetExpressionResponse["body"]>;
@@ -433,6 +434,7 @@ export abstract class BaseDebugClient {
 
   /** SetVariable request; value of command field is 'setVariable'.
         Set the variable with the given name in the variable container to a new value. Clients should only call this request if the capability 'supportsSetVariable' is true.
+        If a debug adapter implements both setVariable and setExpression, a client will only use setExpression if the variable has an evaluateName property.
     */
   public setVariable(args: DebugProtocol.SetVariableRequest["arguments"]): Promise<DebugProtocol.SetVariableResponse["body"]> {
     return this.sendRequest("setVariable", args) as Promise<DebugProtocol.SetVariableResponse["body"]>;
@@ -523,6 +525,13 @@ export abstract class BaseDebugClient {
     return this.sendRequest("variables", args) as Promise<DebugProtocol.VariablesResponse["body"]>;
   }
 
+  /** WriteMemory request; value of command field is 'writeMemory'.
+        Writes bytes to memory at the provided location.
+        Clients should only call this request if the capability 'supportsWriteMemoryRequest' is true.
+    */
+  public writeMemory(args: DebugProtocol.WriteMemoryRequest["arguments"]): Promise<DebugProtocol.WriteMemoryResponse["body"]> {
+    return this.sendRequest("writeMemory", args) as Promise<DebugProtocol.WriteMemoryResponse["body"]>;
+  }
 
 
   // Events

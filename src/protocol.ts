@@ -46,6 +46,7 @@ export type REQUEST_COMMAND
   | "terminateThreads"
   | "threads"
   | "variables"
+  | "writeMemory"
   ;
 
 export type EVENT_TYPE
