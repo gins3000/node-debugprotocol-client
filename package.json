@@ -1,6 +1,6 @@
 {
   "name": "node-debugprotocol-client",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A standalone node client for the VSCode Debug Adapter Protocol",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
