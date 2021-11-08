@@ -57,6 +57,7 @@ export type EVENT_TYPE
   | "initialized"
   | "invalidated"
   | "loadedSource"
+  | "memory"
   | "module"
   | "output"
   | "process"

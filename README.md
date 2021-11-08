@@ -8,7 +8,7 @@ There exist a lot of implementations of the [VSCode Debug Adapter Protocol](http
 This repository hosts a standalone NodeJS client library for the Debug Adapter Protocol, maybe enabling smaller node-based IDEs to get a piece of that cake too.
 
 ## Targeted [vscode-debugprotocol](https://www.npmjs.com/package/vscode-debugprotocol) version
-v1.48.0
+v1.50.1
 
 ## Features
 - An abstract base client (`BaseDebugClient`)
@@ -108,7 +108,7 @@ await client.configurationDone();
 // Event subscriptions can be unsubscribed
 unsubscribable.unsubscribe();
 
-// disconnect the from adapter when done
+// disconnect from the adapter when done
 client.disconnectAdapter();
 ```
 
