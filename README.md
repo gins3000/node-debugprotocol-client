@@ -114,12 +114,18 @@ client.disconnectAdapter();
 
 ## Build for development
 
-```shell
+```bash
 git clone https://github.com/gins3000/node-debugprotocol-client.git
 cd node-debugprotocol-client
 npm install
+
+# build:
 npm run build
+# or watch mode:
+npm run start
 ```
+
+The `npm run boilerplate:*` commands extract names and generate boilerplate methods from the vscode-debugprotocol package. This helps when accommodating for a new version of the protocol.
 
 ## Issues and Feature requests
 Please create an issue if you find this useful (or useless ;_;) and have ideas, suggestions or issues!

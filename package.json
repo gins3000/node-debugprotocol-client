@@ -5,11 +5,15 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "clean": "gulp clean",
-    "build": "gulp build",
+    "clean": "rimraf dist",
+    "build": "tsc --project .",
+    "start": "tsc --project . --watch",
     "lint": "eslint .",
-    "start": "gulp watch",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "boilerplate:request-names": "node ./build/generate-boilerplate.js extract-request-names",
+    "boilerplate:event-names": "node ./build/generate-boilerplate.js extract-event-names",
+    "boilerplate:request-methods": "node ./build/generate-boilerplate.js generate-request-methods",
+    "boilerplate:event-methods": "node ./build/generate-boilerplate.js generate-event-methods"
   },
   "keywords": [
     "vscode",
@@ -22,17 +26,13 @@
   "repository": "https://github.com/gins3000/node-debugprotocol-client",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^15.6.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "del": "^6.0.0",
-    "eslint": "^7.27.0",
-    "gulp": "^4.0.2",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-typescript": "^5.0.1",
-    "merge2": "^1.3.0",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.3.1",
+    "@typescript-eslint/parser": "^5.3.1",
+    "eslint": "^8.2.0",
     "mz": "^2.7.0",
-    "typescript": "^4.2.4",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.4",
     "vscode-debugprotocol": "^1.50.1"
   }
 }

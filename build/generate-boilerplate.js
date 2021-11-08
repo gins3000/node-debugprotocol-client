@@ -1,8 +1,12 @@
 // @ts-check
+'use strict';
 
 const fs = require("mz/fs");
-const gulp = require("gulp");
 
+/**
+ * @param {string} str 
+ * @returns {string}
+ */
 function lowerFirst(str) {
   return str[0].toLocaleLowerCase() + str.slice(1);
 }
@@ -20,13 +24,17 @@ function extractEventTypes() {
   return extractTypes(/(?:(\/\*\*(?:(?!\*\/)[\s\S])+\*\/)[\s]*)?interface (\w+)Event extends Event/g, []);
 }
 
-async function extractTypes(regex, blacklist) {
+/**
+ * @param {RegExp} regex 
+ * @param {string[]} blocklist 
+ */
+async function extractTypes(regex, blocklist) {
   const fileContent = await fs.readFile("node_modules/vscode-debugprotocol/lib/debugProtocol.d.ts", "utf-8");
 
   let match;
   const result = [];
   while (match = regex.exec(fileContent)) {
-    if (!blacklist.includes(match[2])) {
+    if (!blocklist.includes(match[2])) {
       result.push({
         docs: match[1],
         name: match[2],
@@ -35,6 +43,14 @@ async function extractTypes(regex, blacklist) {
   }
 
   return result.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+async function extractRequestNames() {
+  return (await extractRequestTypes()).map((t) => t.name).join("\n");
+}
+
+async function extractEventNames() {
+  return (await extractEventTypes()).map((t) => t.name).join("\n");
 }
 
 async function generateRequestMethods() {
@@ -80,7 +96,22 @@ async function generateEventMethods() {
   return result;
 }
 
-gulp.task("extract-request-names", async () => console.log((await extractRequestTypes()).map((t) => t.name).join("\n")));
-gulp.task("extract-event-names", async () => console.log((await extractEventTypes()).map((t) => t.name).join("\n")));
-gulp.task("generate-request-methods", async () => console.log(await generateRequestMethods()));
-gulp.task("generate-event-methods", async () => console.log(await generateEventMethods()));
+const availableTasks = {
+  "extract-request-names": extractRequestNames,
+  "extract-event-names": extractEventNames,
+  "generate-request-methods": generateRequestMethods,
+  "generate-event-methods": generateEventMethods,
+};
+
+async function run() {
+  const taskName = process.argv[2];
+  const task = availableTasks[taskName];
+  if (!task) {
+    console.error(`usage: node build/generate-boilerplate.js <task name>\nAvailable tasks:\n  ${Object.keys(availableTasks).join('\n  ')}`);
+    return 1;
+  }
+
+  console.log(await task());
+}
+
+run();
