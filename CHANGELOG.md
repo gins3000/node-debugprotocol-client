@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2021-06-03
+- Fix audit vulnerability https://github.com/advisories/GHSA-f8q6-p94x-37v3
+
+## [0.5.0] - 2021-06-03
+- Remove gulp and bring dependencies up to date
+
+## [0.4.0] - 2021-06-03
+- Support vscode-debugprotocol v1.50.1
+
 ## [0.3.0] - 2021-06-03
 - Support vscode-debugprotocol v1.48.0
 
